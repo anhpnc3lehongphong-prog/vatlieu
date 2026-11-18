@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đề Thi Online Hóa Học 12 - Đại Cương Về Polymer</title>
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --primary-bg: #eff6ff;
+            --success: #15803d;
+            --success-bg: #dcfce7;
+            --danger: #b91c1c;
+            --danger-bg: #fee2e2;
+            --warning: #b45309;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --bg-body: #f1f5f9;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: var(--white);
+            padding: 16px 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .school-info h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .school-info p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .timer-box {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.15rem;
+        }
+
+        .timer-box.warning {
+            background: #dc2626;
+            border-color: #fca5a5;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        /* Start Screen */
+        .start-screen {
+            max-width: 550px;
+            margin: 50px auto;
+            background: var(--white);
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .start-screen h2 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+        }
+
+        .start-screen .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .exam-rules {
+            background: var(--primary-bg);
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .exam-rules ul {
+            margin-left: 18px;
+            margin-top: 4px;
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px 20px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .btn:active {
+            transform: scale(0.99);
+        }
+
+        /* Main Exam Layout */
+        .main-container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 16px;
+            display: none;
+            grid-template-columns: 1fr 310px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* Result Banner */
+        .result-banner {
+            display: none;
+            background: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border-top: 5px solid var(--success);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .score-badge {
+            background: var(--success-bg);
+            color: var(--success);
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .score-badge .score-num {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .score-badge .score-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .student-summary p {
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        /* Question Card */
+        .question-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
+            scroll-margin-top: 90px;
+        }
+
+        .question-title {
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+            color: #0f172a;
+        }
+
+        .question-num {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .option-label:hover {
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        .option-label input[type="radio"] {
+            margin-top: 4px;
+            accent-color: var(--primary);
+            width: 17px;
+            height: 17px;
+            cursor: pointer;
+        }
+
+        .option-label.selected {
+            background-color: var(--primary-bg);
+            border-color: var(--primary-light);
+        }
+
+        /* Post-submit styling */
+        .option-label.correct-ans {
+            background-color: var(--success-bg) !important;
+            border-color: var(--success) !important;
+            color: #14532d;
+            font-weight: 600;
+        }
+
+        .option-label.wrong-ans {
+            background-color: var(--danger-bg) !important;
+            border-color: var(--danger) !important;
+            color: #7f1d1d;
+        }
+
+        .explanation-box {
+            display: none;
+            margin-top: 14px;
+            padding: 12px 16px;
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            border-radius: 6px;
+            font-size: 0.94rem;
+            color: #78350f;
+        }
+
+        /* Sidebar Navigator */
+        .sidebar {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            position: sticky;
+            top: 86px;
+        }
+
+        .sidebar-info {
+            font-size: 0.9rem;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sidebar-info div {
+            margin-bottom: 4px;
+        }
+
+        .nav-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .nav-btn {
+            height: 36px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: var(--text-main);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary-light);
+        }
+
+        .nav-btn.answered {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .nav-btn.nav-correct {
+            background: var(--success) !important;
+            color: var(--white) !important;
+            border-color: var(--success) !important;
+        }
+
+        .nav-btn.nav-wrong {
+            background: var(--danger) !important;
+            color: var(--white) !important;
+            border-color: var(--danger) !important;
+        }
+
+        .legend {
+            display: flex;
+            gap: 12px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+        }
+
+        .dot.done { background: var(--primary); border-color: var(--primary); }
+        .dot.correct { background: var(--success); border-color: var(--success); }
+        .dot.wrong { background: var(--danger); border-color: var(--danger); }
+
+        .btn-submit {
+            background: #16a34a;
+        }
+
+        .btn-submit:hover {
+            background: #15803d;
+        }
+
+        .btn-retry {
+            background: #475569;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .btn-retry:hover {
+            background: #334155;
+        }
+
+        @media (max-width: 860px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: static;
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-container">
+        <div class="school-info">
+            <h1>TRƯỜNG THPT LÊ HỒNG PHONG – TỔ HÓA HỌC</h1>
+            <p>Đề kiểm tra trắc nghiệm Hóa học 12 | Bài: Đại cương về polymer</p>
+        </div>
+        <div class="timer-box" id="timerBox" style="display: none;">
+            <span>⏱ Thời gian còn lại:</span>
+            <span id="timerDisplay">45:00</span>
+        </div>
+    </div>
+</header>
+
+<!-- Màn hình nhập thông tin học sinh -->
+<div class="start-screen" id="startScreen">
+    <h2>BÀI KIỂM TRA TRẮC NGHIỆM</h2>
+    <p class="subtitle">Chủ đề: Đại cương về polymer – Hóa học 12 (CTGDPT 2018)</p>
+
+    <div class="form-group">
+        <label for="studentName">Họ và tên học sinh *</label>
+        <input type="text" id="studentName" placeholder="Nhập họ và tên đầy đủ..." required>
+    </div>
+
+    <div class="form-group">
+        <label for="studentClass">Lớp *</label>
+        <input type="text" id="studentClass" placeholder="Ví dụ: 12A1, 12A4..." required>
+    </div>
+
+    <div class="form-group">
+        <label for="studentId">Số báo danh (không bắt buộc)</label>
+        <input type="text" id="studentId" placeholder="Nhập SBD nếu có...">
+    </div>
+
+    <div class="exam-rules">
+        <strong>Thông tin bài làm:</strong>
+        <ul>
+            <li>Số lượng câu hỏi: <strong>30 câu trắc nghiệm</strong> nhiều lựa chọn.</li>
+            <li>Thời gian làm bài: <strong>45 phút</strong> (tự động nộp khi hết giờ).</li>
+            <li>Thang điểm: <strong>10,0 điểm</strong> (mỗi câu đúng đạt 1/3 điểm).</li>
+            <li>Hệ thống sẽ hiển thị điểm số và lời giải chi tiết ngay sau khi nộp bài.</li>
+        </ul>
+    </div>
+
+    <button class="btn" onclick="startExam()">Bắt đầu làm bài</button>
+</div>
+
+<!-- Giao diện làm bài -->
+<div class="main-container" id="examContainer">
+    <div class="questions-column">
+        <!-- Bảng kết quả sau khi nộp -->
+        <div class="result-banner" id="resultBanner">
+            <div class="result-header">
+                <div class="student-summary" id="resultStudentInfo"></div>
+                <div class="score-badge">
+                    <div class="score-num" id="finalScore">0.00</div>
+                    <div class="score-label" id="correctCount">Đúng 0/30 câu</div>
+                </div>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.92rem;">
+                Xem lại chi tiết từng câu bên dưới: màu <strong style="color: var(--success);">xanh lá</strong> là đáp án đúng, màu <strong style="color: var(--danger);">đỏ</strong> là đáp án chọn sai.
+            </p>
+        </div>
+
+        <div id="questionsList"></div>
+    </div>
+
+    <aside class="sidebar">
+        <div class="sidebar-info" id="sidebarStudentInfo"></div>
+        <div class="nav-title">
+            <span>Danh sách câu hỏi</span>
+            <span id="progressText">0/30</span>
+        </div>
+        <div class="legend" id="legendBox">
+            <div class="legend-item"><span class="dot"></span> Chưa làm</div>
+            <div class="legend-item"><span class="dot done"></span> Đã chọn</div>
+        </div>
+        <div class="question-grid" id="questionGrid"></div>
+        <button class="btn btn-submit" id="submitBtn" onclick="confirmSubmit()">Nộp bài thi</button>
+        <button class="btn btn-retry" id="retryBtn" onclick="location.reload()">Làm lại bài mới</button>
+    </aside>
+</div>
+
+<script>
+    const quizData = [
+        {
+            q: "Polymer là những hợp chất có phân tử khối",
+            options: [
+                "rất lớn do nhiều đơn vị nhỏ (mắt xích) liên kết với nhau tạo nên.",
+                "nhỏ và được tạo thành từ các nguyên tố phi kim điển hình.",
+                "trung bình, luôn có cấu tạo mạch không phân nhánh và không tan.",
+                "lớn do nhiều phân tử nước kết hợp với các chất hữu cơ tạo nên."
+            ],
+            ans: 0,
+            exp: "Polymer là những hợp chất có phân tử khối rất lớn do nhiều đơn vị nhỏ (gọi là mắt xích) liên kết với nhau tạo nên."
+        },
+        {
+            q: "Hệ số polymer hóa (<i>n</i>) trong công thức tổng quát của polymer biểu thị",
+            options: [
+                "số lượng nguyên tử carbon có trong một mắt xích polymer.",
+                "số lượng mắt xích có trong một phân tử polymer.",
+                "khối lượng phân tử trung bình tính theo đơn vị amu của polymer.",
+                "số lượng nhóm chức có trong một phân tử monomer ban đầu."
+            ],
+            ans: 1,
+            exp: "Hệ số n được gọi là hệ số polymer hóa (hay độ polymer hóa), biểu thị số lượng mắt xích có trong một phân tử polymer."
+        },
+        {
+            q: "Monomer dùng để điều chế polyethylene (PE) là",
+            options: [
+                "CH<sub>2</sub>=CH–CH<sub>3</sub>.",
+                "CH<sub>2</sub>=CH<sub>2</sub>.",
+                "CH<sub>2</sub>=CH–Cl.",
+                "C<sub>6</sub>H<sub>5</sub>–CH=CH<sub>2</sub>."
+            ],
+            ans: 1,
+            exp: "Trùng hợp ethylene (CH<sub>2</sub>=CH<sub>2</sub>) thu được polyethylene (PE): (–CH<sub>2</sub>–CH<sub>2</sub>–)<sub>n</sub>."
+        },
+        {
+            q: "Polymer nào sau đây có nguồn gốc thiên nhiên?",
+            options: [
+                "Poly(vinyl chloride).",
+                "Polyethylene.",
+                "Tinh bột.",
+                "Polystyrene."
+            ],
+            ans: 2,
+            exp: "Tinh bột có nguồn gốc từ tự nhiên (trong các loại hạt, củ, quả). PVC, PE, PS là polymer tổng hợp."
+        },
+        {
+            q: "Công thức một mắt xích của poly(vinyl chloride) (PVC) là",
+            options: [
+                "–CH<sub>2</sub>–CH<sub>2</sub>–.",
+                "–CH<sub>2</sub>–CH(CH<sub>3</sub>)–.",
+                "–CH<sub>2</sub>–CH(C<sub>6</sub>H<sub>5</sub>)–.",
+                "–CH<sub>2</sub>–CH(Cl)–."
+            ],
+            ans: 3,
+            exp: "PVC có công thức (–CH<sub>2</sub>–CH(Cl)–)<sub>n</sub> nên một mắt xích là –CH<sub>2</sub>–CH(Cl)–."
+        },
+        {
+            q: "Polymer nào sau đây có cấu trúc mạch không phân nhánh?",
+            options: [
+                "Amylopectin.",
+                "Glycogen.",
+                "Cao su lưu hóa.",
+                "Cellulose."
+            ],
+            ans: 3,
+            exp: "Cellulose có cấu trúc mạch không phân nhánh. Amylopectin và glycogen có mạch phân nhánh; cao su lưu hóa có mạng không gian."
+        },
+        {
+            q: "Phản ứng kết hợp nhiều phân tử nhỏ (monomer) giống nhau hoặc tương tự nhau thành phân tử rất lớn (polymer) đồng thời giải phóng những phân tử nhỏ khác (như H<sub>2</sub>O) được gọi là phản ứng",
+            options: [
+                "trùng hợp.",
+                "trùng ngưng.",
+                "xà phòng hóa.",
+                "ester hóa."
+            ],
+            ans: 1,
+            exp: "Định nghĩa phản ứng trùng ngưng: tạo polymer đồng thời giải phóng phân tử nhỏ như H<sub>2</sub>O, HCl, NH<sub>3</sub>..."
+        },
+        {
+            q: "Ở điều kiện thường, phần lớn các polymer tồn tại ở trạng thái",
+            options: [
+                "khí, có mùi thơm đặc trưng.",
+                "lỏng, dễ bay hơi ở nhiệt độ phòng.",
+                "rắn, không bay hơi và không có nhiệt độ nóng chảy xác định.",
+                "rắn, dễ thăng hoa và có nhiệt độ nóng chảy cố định."
+            ],
+            ans: 2,
+            exp: "Hầu hết polymer là chất rắn, không bay hơi và không có nhiệt độ nóng chảy xác định (nóng chảy ở một khoảng nhiệt độ)."
+        },
+        {
+            q: "Polymer nào sau đây được điều chế bằng phản ứng trùng hợp?",
+            options: [
+                "Nylon-6,6.",
+                "Poly(ethylene terephthalate).",
+                "Polypropylene.",
+                "Poly(phenol formaldehyde)."
+            ],
+            ans: 2,
+            exp: "Polypropylene (PP) được điều chế bằng phản ứng trùng hợp propylene (CH<sub>2</sub>=CH–CH<sub>3</sub>). Các chất còn lại điều chế bằng phản ứng trùng ngưng."
+        },
+        {
+            q: "Tên gọi của polymer có công thức cấu tạo (–CH<sub>2</sub>–CH(C<sub>6</sub>H<sub>5</sub>)–)<sub><i>n</i></sub> là",
+            options: [
+                "polystyrene.",
+                "polypropylene.",
+                "poly(methyl methacrylate).",
+                "polyacrylonitrile."
+            ],
+            ans: 0,
+            exp: "Monomer tương ứng là styrene (C<sub>6</sub>H<sub>5</sub>–CH=CH<sub>2</sub>), nên polymer tên là polystyrene (PS)."
+        },
+        {
+            q: "Tính chất vật lí chung nào sau đây là đặc trưng của hầu hết các polymer?",
+            options: [
+                "Dễ tan trong nước và các dung môi hữu cơ thông thường.",
+                "Không tan trong nước và hầu hết các dung môi thông thường.",
+                "Dẫn điện và dẫn nhiệt rất tốt ở trạng thái rắn.",
+                "Dễ bị bay hơi khi đun nóng nhẹ ở áp suất thường."
+            ],
+            ans: 1,
+            exp: "Đa số polymer không tan trong nước và các dung môi thông thường; một số tan được trong dung môi hữu cơ thích hợp."
+        },
+        {
+            q: "Monomer nào sau đây tham gia phản ứng trùng ngưng tạo thành polymer?",
+            options: [
+                "CH<sub>2</sub>=CH–CN.",
+                "CF<sub>2</sub>=CF<sub>2</sub>.",
+                "H<sub>2</sub>N–[CH<sub>2</sub>]<sub>5</sub>–COOH.",
+                "CH<sub>2</sub>=C(CH<sub>3</sub>)–COOCH<sub>3</sub>."
+            ],
+            ans: 2,
+            exp: "H<sub>2</sub>N–[CH<sub>2</sub>]<sub>5</sub>–COOH (ε-aminocaproic acid) có 2 nhóm chức (–NH<sub>2</sub> và –COOH) có khả năng tham gia phản ứng trùng ngưng tạo tơ capron."
+        },
+        {
+            q: "Đặc điểm cấu tạo bắt buộc của các monomer tham gia phản ứng trùng hợp là trong phân tử phải có",
+            options: [
+                "liên kết bội (liên kết đôi, liên kết ba) hoặc vòng kém bền.",
+                "ít nhất hai nhóm chức có khả năng phản ứng tạo liên kết.",
+                "vòng benzene gắn trực tiếp với nhóm chức carboxylic acid.",
+                "nguyên tử halogen liên kết với nguyên tử carbon no."
+            ],
+            ans: 0,
+            exp: "Điều kiện cần về cấu tạo của monomer tham gia phản ứng trùng hợp là có liên kết bội hoặc vòng kém bền."
+        },
+        {
+            q: "Điểm khác biệt cơ bản giữa phản ứng trùng hợp và phản ứng trùng ngưng là phản ứng trùng ngưng",
+            options: [
+                "chỉ áp dụng cho các hydrocarbon không no mạch hở.",
+                "không tạo ra sản phẩm phụ có phân tử khối nhỏ.",
+                "giải phóng các phân tử nhỏ như H<sub>2</sub>O, HCl, NH<sub>3</sub>, ...",
+                "làm cho thành phần nguyên tố của mắt xích giống hệt monomer."
+            ],
+            ans: 2,
+            exp: "Phản ứng trùng ngưng luôn giải phóng các phân tử nhỏ (thường là H<sub>2</sub>O), nên thành phần nguyên tố của mắt xích khác với monomer."
+        },
+        {
+            q: "Phát biểu nào sau đây đúng khi nói về nhiệt độ nóng chảy của polymer?",
+            options: [
+                "Polymer là chất tinh khiết nên nóng chảy ở một nhiệt độ xác định.",
+                "Polymer thường nóng chảy ở một khoảng nhiệt độ khá rộng do gồm nhiều phân tử có kích thước khác nhau.",
+                "Mọi polymer đều nóng chảy thành chất lỏng linh động trước khi bị phân hủy.",
+                "Polymer có cấu trúc mạng không gian dễ nóng chảy hơn polymer mạch không nhánh."
+            ],
+            ans: 1,
+            exp: "Polymer là hỗn hợp nhiều phân tử có hệ số polymer hóa n khác nhau nên nóng chảy ở một khoảng nhiệt độ rộng."
+        },
+        {
+            q: "Polymer nào sau đây có cấu trúc mạng không gian?",
+            options: [
+                "Amylose.",
+                "Polyethylene.",
+                "Nhựa bakelite (nhựa resite).",
+                "Poly(vinyl acetate)."
+            ],
+            ans: 2,
+            exp: "Nhựa bakelite (nhựa resite) và cao su lưu hóa là hai polymer điển hình có cấu trúc mạng không gian."
+        },
+        {
+            q: "Khi đun nóng poly(vinyl acetate) với dung dịch NaOH dư, phản ứng xảy ra thuộc loại phản ứng",
+            options: [
+                "phân cắt mạch polymer.",
+                "tăng mạch polymer.",
+                "giữ nguyên mạch polymer.",
+                "giải trùng hợp hoàn toàn."
+            ],
+            ans: 2,
+            exp: "Phản ứng thủy phân nhóm ester trên nhánh: (–CH<sub>2</sub>–CH(OOCCH<sub>3</sub>)–)<sub>n</sub> + nNaOH → (–CH<sub>2</sub>–CH(OH)–)<sub>n</sub> + nCH<sub>3</sub>COONa. Mạch chính carbon không bị cắt đứt hay nối dài nên thuộc loại giữ nguyên mạch polymer."
+        },
+        {
+            q: "Phát biểu nào sau đây <strong>không</strong> đúng về tính chất hóa học của polymer?",
+            options: [
+                "Phản ứng thủy phân tinh bột trong môi trường acid làm giảm chiều dài mạch polymer.",
+                "Lưu hóa cao su thiên nhiên là quá trình làm tăng mạch polymer, tạo mạng không gian.",
+                "Thủy phân hoàn toàn cellulose tạo thành các phân tử α-glucose.",
+                "Nhiệt phân polystyrene ở nhiệt độ thích hợp thu được monomer styrene ban đầu."
+            ],
+            ans: 2,
+            exp: "Thủy phân hoàn toàn cellulose thu được các phân tử <strong>β-glucose</strong> (không phải α-glucose)."
+        },
+        {
+            q: "Dãy gồm các polymer đều được điều chế bằng phản ứng trùng hợp là",
+            options: [
+                "PE, PVC, nylon-6,6.",
+                "PP, PS, poly(methyl methacrylate).",
+                "Tinh bột, cellulose, tơ tằm.",
+                "PVC, PS, poly(ethylene terephthalate)."
+            ],
+            ans: 1,
+            exp: "PP (từ propylene), PS (từ styrene), poly(methyl methacrylate) (từ methyl methacrylate) đều điều chế bằng phản ứng trùng hợp."
+        },
+        {
+            q: "Hai monomer tham gia phản ứng đồng trùng ngưng để tạo thành tơ nylon-6,6 là",
+            options: [
+                "H<sub>2</sub>N–[CH<sub>2</sub>]<sub>6</sub>–NH<sub>2</sub> và HOOC–[CH<sub>2</sub>]<sub>4</sub>–COOH.",
+                "H<sub>2</sub>N–[CH<sub>2</sub>]<sub>5</sub>–COOH và HOOC–[CH<sub>2</sub>]<sub>4</sub>–COOH.",
+                "HO–CH<sub>2</sub>–CH<sub>2</sub>–OH và <i>p</i>-HOOC–C<sub>6</sub>H<sub>4</sub>–COOH.",
+                "CH<sub>2</sub>=CH–CH=CH<sub>2</sub> và C<sub>6</sub>H<sub>5</sub>–CH=CH<sub>2</sub>."
+            ],
+            ans: 0,
+            exp: "Nylon-6,6 được tổng hợp từ hexamethylenediamine (H<sub>2</sub>N–[CH<sub>2</sub>]<sub>6</sub>–NH<sub>2</sub>) và adipic acid (HOOC–[CH<sub>2</sub>]<sub>4</sub>–COOH)."
+        },
+        {
+            q: "Tính chất nào sau đây <strong>không</strong> thuộc về các polymer có cấu trúc mạng không gian (như cao su lưu hóa, nhựa bakelite)?",
+            options: [
+                "Không nóng chảy mà bị phân hủy khi đun nóng mạnh.",
+                "Không tan trong các dung môi hữu cơ thông thường.",
+                "Độ bền cơ học và khả năng chịu nhiệt cao hơn polymer mạch không nhánh.",
+                "Dễ dàng tan trong xăng, benzene tạo thành dung dịch keo nhớt."
+            ],
+            ans: 3,
+            exp: "Polymer có cấu trúc mạng không gian không tan trong các dung môi hữu cơ (cao su thô tan trong xăng/benzene, nhưng sau khi lưu hóa tạo mạng không gian thì không tan)."
+        },
+        {
+            q: "Cho sơ đồ phản ứng: CH<sub>3</sub>COOCH=CH<sub>2</sub> → <strong>X</strong> (+NaOH, t°) → <strong>Y</strong> + CH<sub>3</sub>COONa. Tên gọi của polymer <strong>Y</strong> là",
+            options: [
+                "poly(vinyl acetate).",
+                "poly(vinyl alcohol).",
+                "poly(methyl acrylate).",
+                "poly(sodium acrylate)."
+            ],
+            ans: 1,
+            exp: "X là poly(vinyl acetate). Thủy phân X trong môi trường kiềm thu được Y là (–CH<sub>2</sub>–CH(OH)–)<sub>n</sub> có tên gọi là poly(vinyl alcohol)."
+        },
+        {
+            q: "Trong thực tế, vì sao người ta không dùng trực tiếp phản ứng trùng hợp vinyl alcohol (CH<sub>2</sub>=CH–OH) để sản xuất poly(vinyl alcohol)?",
+            options: [
+                "Vì vinyl alcohol là chất khí độc hại, khó hóa lỏng trong công nghiệp.",
+                "Vì vinyl alcohol không bền, tự chuyển hóa ngay thành acetaldehyde (CH<sub>3</sub>CHO).",
+                "Vì nhóm –OH làm mất hoạt tính của liên kết đôi C=C.",
+                "Vì poly(vinyl alcohol) thu được từ vinyl alcohol có phân tử khối quá nhỏ."
+            ],
+            ans: 1,
+            exp: "Alcohol có nhóm –OH gắn vào carbon không no (CH<sub>2</sub>=CH–OH) không bền, lập tức đồng phân hóa thành aldehyde CH<sub>3</sub>CHO."
+        },
+        {
+            q: "Số lượng polymer tổng hợp trong dãy sau: tinh bột, polyethylene, tơ tằm, poly(vinyl chloride), cellulose, nylon-6,6, cao su thiên nhiên là",
+            options: [
+                "2.",
+                "3.",
+                "4.",
+                "5."
+            ],
+            ans: 1,
+            exp: "Có 3 polymer tổng hợp là: polyethylene, poly(vinyl chloride), nylon-6,6. Các chất còn lại là polymer thiên nhiên."
+        },
+        {
+            q: "Một loại polyethylene (PE) có phân tử khối trung bình là 420 000 amu. Hệ số polymer hóa trung bình của mẫu PE này là",
+            options: [
+                "15 000.",
+                "14 000.",
+                "12 000.",
+                "10 000."
+            ],
+            ans: 0,
+            exp: "Mắt xích PE (–CH<sub>2</sub>–CH<sub>2</sub>–) có M = 28 amu. Hệ số polymer hóa: n = 420 000 / 28 = 15 000."
+        },
+        {
+            q: "Một mẫu poly(vinyl chloride) (PVC) có hệ số polymer hóa trung bình là 1 200. Phân tử khối trung bình của mẫu PVC này là",
+            options: [
+                "75 000 amu.",
+                "74 400 amu.",
+                "76 800 amu.",
+                "33 600 amu."
+            ],
+            ans: 0,
+            exp: "Mắt xích PVC (–CH<sub>2</sub>–CHCl–) có M = 62,5 amu. Phân tử khối trung bình: M = 1 200 × 62,5 = 75 000 amu."
+        },
+        {
+            q: "Cho các phát biểu sau về polymer:<br>(1) Các polymer đều là chất rắn, không bay hơi và không tan trong nước.<br>(2) Polymer được tổng hợp bằng phản ứng trùng hợp luôn có thành phần nguyên tố giống monomer.<br>(3) Amylopectin và glycogen đều có cấu trúc mạch phân nhánh.<br>(4) Khi đun nóng, tất cả các polymer đều nóng chảy rồi mới bị phân hủy.<br>Số phát biểu đúng là",
+            options: [
+                "1.",
+                "2.",
+                "3.",
+                "4."
+            ],
+            ans: 1,
+            exp: "Các phát biểu đúng là (2) và (3).<br>- (1) Sai vì một số polymer tan trong nước (tinh bột tan trong nước nóng, poly(vinyl alcohol) tan trong nước).<br>- (4) Sai vì polymer nhiệt rắn (như nhựa bakelite, cellulose) không nóng chảy mà phân hủy trực tiếp khi đun nóng."
+        },
+        {
+            q: "Từ 1 tấn ethylene nguyên chất thực hiện phản ứng trùng hợp để điều chế polyethylene (PE) với hiệu suất đạt 85%. Khối lượng PE thu được là",
+            options: [
+                "0,85 tấn.",
+                "1,18 tấn.",
+                "0,75 tấn.",
+                "0,90 tấn."
+            ],
+            ans: 0,
+            exp: "Áp dụng định luật bảo toàn khối lượng: m<sub>PE</sub> = m<sub>ethylene</sub> × H = 1 × 85% = 0,85 tấn."
+        },
+        {
+            q: "Khi chlorine hóa PVC thu được một loại tơ clorin chứa 66,77% chlorine về khối lượng. Trung bình một phân tử Cl<sub>2</sub> tác dụng với bao nhiêu mắt xích PVC?",
+            options: [
+                "1.",
+                "2.",
+                "3.",
+                "4."
+            ],
+            ans: 1,
+            exp: "Gọi k là số mắt xích PVC phản ứng với 1 phân tử Cl<sub>2</sub>: C<sub>2k</sub>H<sub>3k</sub>Cl<sub>k</sub> + Cl<sub>2</sub> → C<sub>2k</sub>H<sub>3k-1</sub>Cl<sub>k+1</sub> + HCl.<br>Ta có: %m<sub>Cl</sub> = 35,5(k + 1) / (62,5k + 34,5) = 0,6677 ⇒ k ≈ 2."
+        },
+        {
+            q: "Tiến hành trùng ngưng 13,1 gam ε-aminocaproic acid (H<sub>2</sub>N–[CH<sub>2</sub>]<sub>5</sub>–COOH) với hiệu suất 80%, thu được <i>m</i> gam polymer (tơ capron) và nước. Giá trị của <i>m</i> là",
+            options: [
+                "10,48.",
+                "9,04.",
+                "11,30.",
+                "8,80."
+            ],
+            ans: 1,
+            exp: "n<sub>monomer ban đầu</sub> = 13,1 / 131 = 0,1 mol ⇒ n<sub>phản ứng</sub> = 0,1 × 80% = 0,08 mol.<br>Khối lượng tơ capron (M mắt xích = 113 g/mol): m = 0,08 × 113 = 9,04 gam."
+        }
+    ];
+
+    let userAnswers = new Array(quizData.length).fill(null);
+    let timeRemaining = 45 * 60; // 45 phút
+    let timerInterval = null;
+    let isSubmitted = false;
+
+    function startExam() {
+        const name = document.getElementById('studentName').value.trim();
+        const sClass = document.getElementById('studentClass').value.trim();
+        const sId = document.getElementById('studentId').value.trim();
+
+        if (!name || !sClass) {
+            alert("Vui lòng nhập đầy đủ Họ tên và Lớp trước khi bắt đầu!");
+            return;
+        }
+
+        document.getElementById('startScreen').style.display = 'none';
+        document.getElementById('examContainer').style.display = 'grid';
+        document.getElementById('timerBox').style.display = 'flex';
+
+        document.getElementById('sidebarStudentInfo').innerHTML = `
+            <div><strong>Học sinh:</strong> ${escapeHtml(name)}</div>
+            <div><strong>Lớp:</strong> ${escapeHtml(sClass)} ${sId ? `| <strong>SBD:</strong> ${escapeHtml(sId)}` : ''}</div>
+        `;
+
+        renderQuestions();
+        renderNavigator();
+        startTimer();
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function renderQuestions() {
+        const container = document.getElementById('questionsList');
+        const letters = ['A', 'B', 'C', 'D'];
+        let html = '';
+
+        quizData.forEach((item, qIdx) => {
+            html += `
+                <div class="question-card" id="q-card-${qIdx}">
+                    <div class="question-title">
+                        <span class="question-num">Câu ${qIdx + 1}.</span> ${item.q}
+                    </div>
+                    <div class="options-list">
+                        ${item.options.map((opt, oIdx) => `
+                            <label class="option-label" id="opt-label-${qIdx}-${oIdx}">
+                                <input type="radio" name="q_${qIdx}" value="${oIdx}" onchange="selectOption(${qIdx}, ${oIdx})">
+                                <span><strong>${letters[oIdx]}.</strong> ${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div class="explanation-box" id="exp-${qIdx}">
+                        <strong>💡 Giải thích:</strong> ${item.exp}
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function renderNavigator() {
+        const grid = document.getElementById('questionGrid');
+        let html = '';
+        for (let i = 0; i < quizData.length; i++) {
+            html += `<button class="nav-btn" id="nav-btn-${i}" onclick="scrollToQuestion(${i})">${i + 1}</button>`;
+        }
+        grid.innerHTML = html;
+    }
+
+    function selectOption(qIdx, oIdx) {
+        if (isSubmitted) return;
+        userAnswers[qIdx] = oIdx;
+
+        // Cập nhật trạng thái chọn trên UI
+        for (let i = 0; i < 4; i++) {
+            const lbl = document.getElementById(`opt-label-${qIdx}-${i}`);
+            lbl.classList.toggle('selected', i === oIdx);
+        }
+
+        // Cập nhật bảng điều hướng
+        document.getElementById(`nav-btn-${qIdx}`).classList.add('answered');
+        const answeredCount = userAnswers.filter(a => a !== null).length;
+        document.getElementById('progressText').textContent = `${answeredCount}/${quizData.length}`;
+    }
+
+    function scrollToQuestion(qIdx) {
+        const el = document.getElementById(`q-card-${qIdx}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function startTimer() {
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            updateTimerDisplay();
+
+            if (timeRemaining <= 300) {
+                document.getElementById('timerBox').classList.add('warning');
+            }
+
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                alert("Đã hết thời gian làm bài! Hệ thống tự động nộp bài của bạn.");
+                submitExam();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const mins = Math.floor(timeRemaining / 60);
+        const secs = timeRemaining % 60;
+        document.getElementById('timerDisplay').textContent =
+            `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function confirmSubmit() {
+        const unanswered = userAnswers.filter(a => a === null).length;
+        let msg = "Bạn có chắc chắn muốn nộp bài không?";
+        if (unanswered > 0) {
+            msg = `Bạn còn ${unanswered} câu chưa chọn đáp án. Bạn vẫn muốn nộp bài chứ?`;
+        }
+        if (confirm(msg)) {
+            submitExam();
+        }
+    }
+
+    function submitExam() {
+        if (isSubmitted) return;
+        isSubmitted = true;
+        clearInterval(timerInterval);
+
+        let correct = 0;
+        quizData.forEach((item, qIdx) => {
+            const userChoice = userAnswers[qIdx];
+            const rightAns = item.ans;
+            const navBtn = document.getElementById(`nav-btn-${qIdx}`);
+
+            // Khóa radio buttons
+            const radios = document.getElementsByName(`q_${qIdx}`);
+            radios.forEach(r => r.disabled = true);
+
+            // Tô màu đáp án đúng
+            document.getElementById(`opt-label-${qIdx}-${rightAns}`).classList.add('correct-ans');
+
+            if (userChoice === rightAns) {
+                correct++;
+                navBtn.classList.remove('answered');
+                navBtn.classList.add('nav-correct');
+            } else {
+                if (userChoice !== null) {
+                    document.getElementById(`opt-label-${qIdx}-${userChoice}`).classList.add('wrong-ans');
+                }
+                navBtn.classList.remove('answered');
+                navBtn.classList.add('nav-wrong');
+            }
+
+            // Hiện lời giải
+            document.getElementById(`exp-${qIdx}`).style.display = 'block';
+        });
+
+        const score = ((correct / quizData.length) * 10).toFixed(2);
+        const name = document.getElementById('studentName').value.trim();
+        const sClass = document.getElementById('studentClass').value.trim();
+        const sId = document.getElementById('studentId').value.trim();
+        const usedSeconds = (45 * 60) - timeRemaining;
+        const usedMins = Math.floor(usedSeconds / 60);
+        const usedSecs = usedSeconds % 60;
+
+        document.getElementById('finalScore').textContent = `${score} đ`;
+        document.getElementById('correctCount').textContent = `Đúng ${correct}/${quizData.length} câu`;
+        document.getElementById('resultStudentInfo').innerHTML = `
+            <p><strong>Thí sinh:</strong> ${escapeHtml(name)} – <strong>Lớp:</strong> ${escapeHtml(sClass)} ${sId ? `(SBD: ${escapeHtml(sId)})` : ''}</p>
+            <p><strong>Thời gian hoàn thành:</strong> ${usedMins} phút ${usedSecs} giây</p>
+        `;
+
+        document.getElementById('legendBox').innerHTML = `
+            <div class="legend-item"><span class="dot correct"></span> Đúng</div>
+            <div class="legend-item"><span class="dot wrong"></span> Sai / Chưa làm</div>
+        `;
+
+        document.getElementById('resultBanner').style.display = 'block';
+        document.getElementById('submitBtn').style.display = 'none';
+        document.getElementById('retryBtn').style.display = 'block';
+        document.getElementById('timerBox').classList.remove('warning');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
